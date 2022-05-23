@@ -1,6 +1,11 @@
 Doctrine ORM Batch Process
 ==========================
 
+[![Build Status](https://travis-ci.org/Ang3/doctrine-orm-batch-process.svg?branch=master)](https://travis-ci.org/Ang3/doctrine-orm-batch-process)
+[![Latest Stable Version](https://poser.pugx.org/ang3/doctrine-orm-batch-process/v/stable)](https://packagist.org/packages/ang3/doctrine-orm-batch-process)
+[![Latest Unstable Version](https://poser.pugx.org/ang3/doctrine-orm-batch-process/v/unstable)](https://packagist.org/packages/ang3/doctrine-orm-batch-process)
+[![Total Downloads](https://poser.pugx.org/ang3/doctrine-orm-batch-process/downloads)](https://packagist.org/packages/ang3/doctrine-orm-batch-process)
+
 This component helps you to deal with 
 [batch-processing](https://www.doctrine-project.org/projects/doctrine-orm/en/latest/reference/batch-processing.html) 
 in the context of Doctrine ORM transactions.
