@@ -1,0 +1,27 @@
+{
+	"name": "ang3/doctrine-orm-batch-process",
+	"type": "library",
+	"homepage": "https://github.com/Ang3/doctrine-orm-batch-process",
+	"description": "Doctrine ORM Batch Process",
+    "license": "MIT",
+	"authors": [
+		{
+			"name": "Joanis ROUANET",
+			"homepage": "https://github.com/Ang3"
+		}
+	],
+	"autoload": {
+		"psr-4": {"Ang3\\Doctrine\\ORM\\BatchProcess\\": "src/"}
+	},
+	"autoload-dev": {
+		"psr-4": { "Ang3\\Doctrine\\ORM\\BatchProcess\\Tests\\": "tests/" }
+	},
+    "require": {
+    	"php": "^8.0",
+		"doctrine/orm": "^2.12"
+    },
+    "require-dev": {
+		"symfony/phpunit-bridge": "^5.0 || ^6.0",
+		"symfony/var-dumper": "^4.0 || ^5.0 || ^6.0"
+    }
+}
