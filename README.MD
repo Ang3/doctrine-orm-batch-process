@@ -1,7 +1,7 @@
 Doctrine ORM Batch Process
 ==========================
 
-[![Build Status](https://travis-ci.org/Ang3/doctrine-orm-batch-process.svg?branch=master)](https://travis-ci.org/Ang3/doctrine-orm-batch-process)
+[![Build Status](https://api.travis-ci.com/Ang3/doctrine-orm-batch-process.svg?branch=main)](https://app.travis-ci.com/github/Ang3/doctrine-orm-batch-process)
 [![Latest Stable Version](https://poser.pugx.org/ang3/doctrine-orm-batch-process/v/stable)](https://packagist.org/packages/ang3/doctrine-orm-batch-process)
 [![Latest Unstable Version](https://poser.pugx.org/ang3/doctrine-orm-batch-process/v/unstable)](https://packagist.org/packages/ang3/doctrine-orm-batch-process)
 [![Total Downloads](https://poser.pugx.org/ang3/doctrine-orm-batch-process/downloads)](https://packagist.org/packages/ang3/doctrine-orm-batch-process)
