@@ -9,12 +9,16 @@ use Doctrine\ORM\QueryBuilder;
 
 class BatchProcessFactory
 {
+    public function __construct(private EntityManagerInterface $entityManager)
+    {
+    }
+
     /**
      * @param class-string $entityFqcn
      */
-    public function createFromEntityIdentifiers(EntityManagerInterface $entityManager, string $entityFqcn, array $identifiers): BatchProcess
+    public function createFromEntityIdentifiers(string $entityFqcn, array $identifiers): BatchProcess
     {
-        return BatchProcess::fromEntityIdentifiers($entityManager, $entityFqcn, $identifiers);
+        return BatchProcess::fromEntityIdentifiers($this->entityManager, $entityFqcn, $identifiers);
     }
 
     public function createFromQueryBuilderResult(QueryBuilder $queryBuilder): BatchProcess
@@ -27,18 +31,18 @@ class BatchProcessFactory
         return BatchProcess::fromOrmQuery($query);
     }
 
-    public function createFromCallable(EntityManagerInterface $entityManager, callable $callback): BatchProcess
+    public function createFromCallable(callable $callback): BatchProcess
     {
-        return BatchProcess::fromCallable($entityManager, $callback);
+        return BatchProcess::fromCallable($this->entityManager, $callback);
     }
 
-    public function createFromIterable(EntityManagerInterface $entityManager, iterable $data): BatchProcess
+    public function createFromIterable(iterable $data): BatchProcess
     {
-        return BatchProcess::fromIterable($entityManager, $data);
+        return BatchProcess::fromIterable($this->entityManager, $data);
     }
 
-    public function create(EntityManagerInterface $entityManager, ProcessIteratorInterface $iterator): BatchProcess
+    public function create(ProcessIteratorInterface $iterator): BatchProcess
     {
-        return BatchProcess::create($entityManager, $iterator);
+        return BatchProcess::create($this->entityManager, $iterator);
     }
 }
