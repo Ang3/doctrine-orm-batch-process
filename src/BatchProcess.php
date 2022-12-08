@@ -245,9 +245,9 @@ class BatchProcess
     }
 
     /**
-     * @throws ProcessExceptionInterface on process failure
-     *
      * @return int nb of iterations achieved
+     *
+     * @throws ProcessExceptionInterface on process failure
      */
     public function execute(): int
     {
