@@ -1,23 +1,29 @@
 <?php
 
-namespace Ang3\Doctrine\ORM\BatchProcess\Handler;
+declare(strict_types=1);
 
-use Ang3\Doctrine\ORM\BatchProcess\ProcessIteration;
-use Countable;
-use Generator;
-use IteratorAggregate;
+/*
+ * This file is part of package ang3/php-doctrine-orm-batch
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
-final class ChainHandler implements ProcessHandlerInterface, IteratorAggregate, Countable
+namespace Ang3\Doctrine\ORM\Batch\Handler;
+
+use Ang3\Doctrine\ORM\Batch\BatchIteration;
+
+final class ChainHandler implements BatchHandlerInterface, \IteratorAggregate, \Countable
 {
-    use ProcessHandlerTrait;
+    use BatchHandlerTrait;
 
     /**
-     * @var ProcessHandlerInterface[]
+     * @var BatchHandlerInterface[]
      */
     private array $handlers = [];
 
     /**
-     * @param ProcessHandlerInterface[] $handlers
+     * @param BatchHandlerInterface[] $handlers
      */
     public function __construct(array $handlers = [])
     {
@@ -26,7 +32,7 @@ final class ChainHandler implements ProcessHandlerInterface, IteratorAggregate, 
         }
     }
 
-    public function __invoke(ProcessIteration $iteration): void
+    public function __invoke(BatchIteration $iteration): void
     {
         foreach ($this->handlers as $handler) {
             $handler($iteration);
@@ -34,7 +40,7 @@ final class ChainHandler implements ProcessHandlerInterface, IteratorAggregate, 
     }
 
     /**
-     * @param ProcessHandlerInterface[] $handlers
+     * @param BatchHandlerInterface[] $handlers
      */
     public static function new(array $handlers = []): self
     {
@@ -42,34 +48,34 @@ final class ChainHandler implements ProcessHandlerInterface, IteratorAggregate, 
     }
 
     /**
-     * @return Generator|ProcessHandlerInterface[]
+     * @return \Generator|BatchHandlerInterface[]
      */
-    public function getIterator(): Generator
+    public function getIterator(): \Generator
     {
         foreach ($this->handlers as $handler) {
             yield $handler;
         }
     }
 
-    public function prepend(ProcessHandlerInterface $handler): self
+    public function prepend(BatchHandlerInterface $handler): self
     {
-        if (!in_array($handler, $this->handlers, true)) {
+        if (!\in_array($handler, $this->handlers, true)) {
             array_unshift($this->handlers, $handler);
         }
 
         return $this;
     }
 
-    public function append(ProcessHandlerInterface $handler): self
+    public function append(BatchHandlerInterface $handler): self
     {
-        if (!in_array($handler, $this->handlers, true)) {
+        if (!\in_array($handler, $this->handlers, true)) {
             $this->handlers[] = $handler;
         }
 
         return $this;
     }
 
-    public function remove(ProcessHandlerInterface $handler): self
+    public function remove(BatchHandlerInterface $handler): self
     {
         $key = array_search($handler, $this->handlers, true);
 
@@ -80,14 +86,14 @@ final class ChainHandler implements ProcessHandlerInterface, IteratorAggregate, 
         return $this;
     }
 
-    public function first(): ?ProcessHandlerInterface
+    public function first(): ?BatchHandlerInterface
     {
         reset($this->handlers);
 
         return $this->handlers[0] ?? null;
     }
 
-    public function last(): ?ProcessHandlerInterface
+    public function last(): ?BatchHandlerInterface
     {
         $handlers = array_reverse($this->handlers);
         reset($this->handlers);
@@ -104,6 +110,6 @@ final class ChainHandler implements ProcessHandlerInterface, IteratorAggregate, 
 
     public function count(): int
     {
-        return count($this->handlers);
+        return \count($this->handlers);
     }
 }

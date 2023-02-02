@@ -1,31 +1,36 @@
 <?php
 
-namespace Ang3\Doctrine\ORM\BatchProcess;
+declare(strict_types=1);
+
+/*
+ * This file is part of package ang3/php-doctrine-orm-batch
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace Ang3\Doctrine\ORM\Batch;
 
 trait OptionsTraits
 {
     private ?OptionsBag $options = null;
 
-    /**
-     * @param mixed|null $value
-     */
-    protected function setOption(string $name, $value): static
+    protected function setOption(string $name, mixed $value): static
     {
         $this
             ->getOptions()
-            ->set($name, $value);
+            ->set($name, $value)
+        ;
 
         return $this;
     }
 
-    /**
-     * @return mixed|null
-     */
     protected function getOption(string $name): mixed
     {
         return $this
             ->getOptions()
-            ->get($name);
+            ->get($name)
+        ;
     }
 
     protected function getOptions(): OptionsBag

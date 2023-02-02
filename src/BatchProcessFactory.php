@@ -1,48 +1,41 @@
 <?php
 
-namespace Ang3\Doctrine\ORM\BatchProcess;
+declare(strict_types=1);
 
-use Ang3\Doctrine\ORM\BatchProcess\Iterator\ProcessIteratorInterface;
+/*
+ * This file is part of package ang3/php-doctrine-orm-batch
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace Ang3\Doctrine\ORM\Batch;
+
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
 class BatchProcessFactory
 {
-    public function __construct(private EntityManagerInterface $entityManager)
+    public function __construct(private readonly EntityManagerInterface $entityManager)
     {
+    }
+
+    public function iterateData(iterable|callable $data): BatchProcess
+    {
+        return BatchProcess::iterateData($this->entityManager, $data);
     }
 
     /**
      * @param class-string $entityFqcn
      */
-    public function createFromEntityIdentifiers(string $entityFqcn, array $identifiers): BatchProcess
+    public function iterateEntities(string $entityFqcn, array $identifiers): BatchProcess
     {
-        return BatchProcess::fromEntityIdentifiers($this->entityManager, $entityFqcn, $identifiers);
+        return BatchProcess::iterateEntities($this->entityManager, $entityFqcn, $identifiers);
     }
 
-    public function createFromQueryBuilderResult(QueryBuilder $queryBuilder): BatchProcess
+    public function iterateQueryResult(Query|QueryBuilder $query): BatchProcess
     {
-        return BatchProcess::fromQueryBuilderResult($queryBuilder);
-    }
-
-    public function createFromQuery(Query $query): BatchProcess
-    {
-        return BatchProcess::fromOrmQuery($query);
-    }
-
-    public function createFromCallable(callable $callback): BatchProcess
-    {
-        return BatchProcess::fromCallable($this->entityManager, $callback);
-    }
-
-    public function createFromIterable(iterable $data): BatchProcess
-    {
-        return BatchProcess::fromIterable($this->entityManager, $data);
-    }
-
-    public function create(ProcessIteratorInterface $iterator): BatchProcess
-    {
-        return BatchProcess::create($this->entityManager, $iterator);
+        return BatchProcess::iterateQueryResult($query);
     }
 }

@@ -1,8 +1,8 @@
 {
-	"name": "ang3/doctrine-orm-batch-process",
+	"name": "ang3/doctrine-orm-batch",
 	"type": "library",
 	"homepage": "https://github.com/Ang3/doctrine-orm-batch-process",
-	"description": "Doctrine ORM Batch Process",
+	"description": "Doctrine ORM Batch component",
     "license": "MIT",
 	"authors": [
 		{
@@ -11,17 +11,20 @@
 		}
 	],
 	"autoload": {
-		"psr-4": {"Ang3\\Doctrine\\ORM\\BatchProcess\\": "src/"}
+		"psr-4": {
+			"Ang3\\Doctrine\\ORM\\Batch\\": "src/"
+		}
 	},
 	"autoload-dev": {
-		"psr-4": { "Ang3\\Doctrine\\ORM\\BatchProcess\\Tests\\": "tests/" }
+		"psr-4": {
+			"Ang3\\Doctrine\\ORM\\Batch\\Tests\\": "tests/"
+		}
 	},
     "require": {
-    	"php": "^8.0",
+    	"php": ">=8.1",
 		"doctrine/orm": "^2.12"
     },
-    "require-dev": {
-		"symfony/phpunit-bridge": "^5.0 || ^6.0",
-		"symfony/var-dumper": "^4.0 || ^5.0 || ^6.0"
-    }
+	"require-dev": {
+		"symfony/test-pack": "^1.0"
+	}
 }

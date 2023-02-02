@@ -1,23 +1,30 @@
 <?php
 
-namespace Ang3\Doctrine\ORM\BatchProcess;
+declare(strict_types=1);
 
-use Ang3\Doctrine\ORM\BatchProcess\Exception\ProcessException;
-use Ang3\Doctrine\ORM\BatchProcess\Exception\ProcessExceptionInterface;
-use Ang3\Doctrine\ORM\BatchProcess\Exception\RollbackFailureException;
-use Ang3\Doctrine\ORM\BatchProcess\Handler\ProcessHandlerInterface;
-use Ang3\Doctrine\ORM\BatchProcess\Iterator\CallableProcessIterator;
-use Ang3\Doctrine\ORM\BatchProcess\Iterator\IdentifiedEntityIterator;
-use Ang3\Doctrine\ORM\BatchProcess\Iterator\OrmQueryProcessIterator;
-use Ang3\Doctrine\ORM\BatchProcess\Iterator\ProcessIterator;
-use Ang3\Doctrine\ORM\BatchProcess\Iterator\ProcessIteratorInterface;
+/*
+ * This file is part of package ang3/php-doctrine-orm-batch
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace Ang3\Doctrine\ORM\Batch;
+
+use Ang3\Doctrine\ORM\Batch\Exception\ProcessException;
+use Ang3\Doctrine\ORM\Batch\Exception\ProcessExceptionInterface;
+use Ang3\Doctrine\ORM\Batch\Exception\RollbackFailureException;
+use Ang3\Doctrine\ORM\Batch\Handler\BatchHandlerInterface;
+use Ang3\Doctrine\ORM\Batch\Iterator\BatchIterator;
+use Ang3\Doctrine\ORM\Batch\Iterator\BatchIteratorInterface;
+use Ang3\Doctrine\ORM\Batch\Iterator\CallableIterator;
+use Ang3\Doctrine\ORM\Batch\Iterator\EntityIdentifiersIterator;
+use Ang3\Doctrine\ORM\Batch\Iterator\OrmQueryIterator;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Id\AssignedGenerator;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Generator;
-use Throwable;
 
 /**
  * A batch process for an entity manager.
@@ -58,56 +65,49 @@ class BatchProcess
     ];
     private float $runTime = 0.00;
 
-    public function __construct(private EntityManagerInterface $entityManager,
-                                private ProcessIteratorInterface $iterator,
-                                private ?ProcessHandlerInterface $handler = null,
-                                ?int $bufferSize = null)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private BatchIteratorInterface $iterator,
+        private ?BatchHandlerInterface $handler = null,
+        ?int $bufferSize = null
+    ) {
         $this->options = new OptionsBag(self::DEFAULT_OPTIONS);
         $this->setBufferSize($bufferSize ?: self::DEFAULT_BUFFER_SIZE);
+    }
+
+    public static function iterateData(EntityManagerInterface $entityManager, iterable|callable $data): self
+    {
+        return self::create($entityManager, \is_callable($data) ? new CallableIterator($data) : new BatchIterator($data));
     }
 
     /**
      * @param class-string $entityFqcn
      */
-    public static function fromEntityIdentifiers(EntityManagerInterface $entityManager, string $entityFqcn, array $identifiers): self
+    public static function iterateEntities(EntityManagerInterface $entityManager, string $entityFqcn, array $identifiers): self
     {
-        return self::create($entityManager, new IdentifiedEntityIterator($entityFqcn, $identifiers));
+        return self::create($entityManager, new EntityIdentifiersIterator($entityFqcn, $identifiers));
     }
 
-    public static function fromQueryBuilderResult(QueryBuilder $queryBuilder): self
+    public static function iterateQueryResult(Query|QueryBuilder $query): self
     {
-        return self::fromOrmQuery($queryBuilder->getQuery());
+        $query = $query instanceof QueryBuilder ? $query->getQuery() : $query;
+
+        return self::create($query->getEntityManager(), new OrmQueryIterator($query));
     }
 
-    public static function fromOrmQuery(Query $query): self
-    {
-        return self::create($query->getEntityManager(), new OrmQueryProcessIterator($query));
-    }
-
-    public static function fromCallable(EntityManagerInterface $entityManager, callable $callback): self
-    {
-        return self::create($entityManager, new CallableProcessIterator($callback));
-    }
-
-    public static function fromIterable(EntityManagerInterface $entityManager, iterable $data): self
-    {
-        return self::create($entityManager, new ProcessIterator($data));
-    }
-
-    public static function create(EntityManagerInterface $entityManager, ProcessIteratorInterface $iterator): self
+    public static function create(EntityManagerInterface $entityManager, BatchIteratorInterface $iterator): self
     {
         return new self($entityManager, $iterator);
     }
 
-    public function setIterator(ProcessIteratorInterface $iterator): self
+    public function setIterator(BatchIteratorInterface $iterator): self
     {
         $this->iterator = $iterator;
 
         return $this;
     }
 
-    public function setHandler(?ProcessHandlerInterface $handler = null): self
+    public function setHandler(?BatchHandlerInterface $handler = null): self
     {
         $this->handler = $handler;
 
@@ -127,7 +127,7 @@ class BatchProcess
         $data = $this->getOption(self::OPTION_DISABLED_ID_GENERATORS);
 
         foreach ($classNames as $className) {
-            if (!in_array($className, $data, true)) {
+            if (!\in_array($className, $data, true)) {
                 $data[] = $className;
             }
         }
@@ -143,7 +143,7 @@ class BatchProcess
         $data = $this->getOption(self::OPTION_DISABLED_ID_GENERATORS);
 
         foreach ($classNames as $className) {
-            $key = array_search($className, $data);
+            $key = array_search($className, $data, true);
 
             if (false !== $key) {
                 unset($data[$key]);
@@ -221,22 +221,21 @@ class BatchProcess
         return $this->entityManager;
     }
 
-    public function getIterator(): ProcessIteratorInterface
+    public function getIterator(): BatchIteratorInterface
     {
         return $this->iterator;
     }
 
-    public function getHandler(): ?ProcessHandlerInterface
+    public function getHandler(): ?BatchHandlerInterface
     {
         return $this->handler;
     }
 
     public function getBufferSize(): int
     {
-        /** @var int $bufferSize */
         $bufferSize = $this->getOption(self::OPTION_BUFFER_SIZE);
 
-        return $bufferSize;
+        return \is_int($bufferSize) ? $bufferSize : self::DEFAULT_BUFFER_SIZE;
     }
 
     public function getRunTime(): float
@@ -265,22 +264,22 @@ class BatchProcess
         }
 
         try {
-            foreach ($this->iterate() as $processIteration) {
-                if (0 === $count && is_callable($firstIterationCallable = $this->getOption(self::OPTION_ON_FIRST_ITERATION_CALLABLE))) {
-                    $firstIterationCallable($processIteration);
+            foreach ($this->iterate() as $batchIteration) {
+                if (0 === $count && \is_callable($firstIterationCallable = $this->getOption(self::OPTION_ON_FIRST_ITERATION_CALLABLE))) {
+                    $firstIterationCallable($batchIteration);
                 }
 
                 if ($handler = $this->handler) {
-                    $handler->__invoke($processIteration);
+                    $handler->__invoke($batchIteration);
                 }
 
                 ++$count;
             }
-        } catch (Throwable $exception) {
-            if (is_callable($rollbackCallable = $this->getOption(self::OPTION_ROLLBACK_CALLABLE))) {
+        } catch (\Throwable $exception) {
+            if (\is_callable($rollbackCallable = $this->getOption(self::OPTION_ROLLBACK_CALLABLE))) {
                 try {
-                    $rollbackCallable($this, $exception);
-                } catch (Throwable $exception) {
+                    $rollbackCallable($this, $exception, $batchIteration ?? null);
+                } catch (\Throwable $exception) {
                     throw new RollbackFailureException('Failed to rollback due to process failure.', 0, $exception);
                 }
             } else {
@@ -300,9 +299,9 @@ class BatchProcess
     }
 
     /**
-     * @return Generator|ProcessIteration[]
+     * @return \Generator|BatchIteration[]
      */
-    public function iterate(): Generator
+    public function iterate(): \Generator
     {
         [$count, $this->runTime, $microTime] = [0, 0.00, microtime(true)];
         $connection = $this->entityManager->getConnection();
@@ -312,10 +311,10 @@ class BatchProcess
         $this->iterator->setEntityManager($this->entityManager);
 
         foreach ($this->iterator as $data) {
-            yield $count => $processIteration = new ProcessIteration($this, $data, $count);
+            yield $count => $batchIteration = new BatchIteration($this, $data, $count);
 
             if ($count > 1 && 0 === ($count % $this->getBufferSize())) {
-                $this->flush($processIteration);
+                $this->flush($batchIteration);
             }
 
             ++$count;
@@ -331,7 +330,7 @@ class BatchProcess
     /**
      * @internal
      */
-    private function flush(?ProcessIteration $iteration = null): void
+    private function flush(?BatchIteration $iteration = null): void
     {
         $this->entityManager->flush();
         $this->entityManager->clear();
@@ -346,7 +345,7 @@ class BatchProcess
             $entity = $this->entityManager->find($classMetadata->getName(), $idProperty->getValue($entity));
         }
 
-        if (is_callable($onFlush = $this->getOption(self::OPTION_ON_FLUSH_CALLABLE))) {
+        if (\is_callable($onFlush = $this->getOption(self::OPTION_ON_FLUSH_CALLABLE))) {
             $onFlush($this, $iteration);
         }
     }

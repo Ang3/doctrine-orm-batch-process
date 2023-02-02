@@ -9,8 +9,16 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Ang3\Doctrine\ORM\Batch\Exception;
+namespace Ang3\Doctrine\ORM\Batch\Handler;
 
-interface ProcessExceptionInterface extends \Throwable
+use Ang3\Doctrine\ORM\Batch\OptionsTraits;
+
+trait BatchHandlerTrait
 {
+    use OptionsTraits;
+
+    public static function new(): static
+    {
+        return new static();
+    }
 }

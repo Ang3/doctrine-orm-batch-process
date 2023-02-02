@@ -1,12 +1,21 @@
 <?php
 
-namespace Ang3\Doctrine\ORM\BatchProcess\Handler;
+declare(strict_types=1);
 
-use Ang3\Doctrine\ORM\BatchProcess\ProcessIteration;
+/*
+ * This file is part of package ang3/php-doctrine-orm-batch
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
-final class CallableHandler implements ProcessHandlerInterface
+namespace Ang3\Doctrine\ORM\Batch\Handler;
+
+use Ang3\Doctrine\ORM\Batch\BatchIteration;
+
+final class CallableHandler implements BatchHandlerInterface
 {
-    use ProcessHandlerTrait;
+    use BatchHandlerTrait;
 
     /**
      * @var callable
@@ -23,7 +32,7 @@ final class CallableHandler implements ProcessHandlerInterface
         return new self($callable);
     }
 
-    public function __invoke(ProcessIteration $iteration): void
+    public function __invoke(BatchIteration $iteration): void
     {
         $callable = $this->callable;
         $callable($iteration->getData(), $iteration);

@@ -1,14 +1,21 @@
 <?php
 
-namespace Ang3\Doctrine\ORM\BatchProcess\Handler;
+declare(strict_types=1);
 
-use Ang3\Doctrine\ORM\BatchProcess\ProcessIteration;
-use Doctrine\ORM\EntityManagerInterface;
-use InvalidArgumentException;
+/*
+ * This file is part of package ang3/php-doctrine-orm-batch
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
-final class PersistEntityHandler implements ProcessHandlerInterface
+namespace Ang3\Doctrine\ORM\Batch\Handler;
+
+use Ang3\Doctrine\ORM\Batch\BatchIteration;
+
+final class PersistEntityHandler implements BatchHandlerInterface
 {
-    use ProcessHandlerTrait;
+    use BatchHandlerTrait;
 
     /**
      * Handler options.
@@ -25,15 +32,16 @@ final class PersistEntityHandler implements ProcessHandlerInterface
     {
         return (new self())
             ->setOption(self::OPTION_SKIP_INSERTIONS, false)
-            ->setOption(self::OPTION_SKIP_UPDATES, false);
+            ->setOption(self::OPTION_SKIP_UPDATES, false)
+        ;
     }
 
-    public function __invoke(ProcessIteration $iteration): void
+    public function __invoke(BatchIteration $iteration): void
     {
         $entity = $iteration->getData();
 
-        if (!is_object($entity)) {
-            throw new InvalidArgumentException(sprintf('Expected data of type "object", got "%s".', gettype($entity)));
+        if (!\is_object($entity)) {
+            throw new \InvalidArgumentException(sprintf('Expected data of type "object", got "%s".', \gettype($entity)));
         }
 
         [$skipInsertions, $skipUpdates] = [
@@ -42,42 +50,36 @@ final class PersistEntityHandler implements ProcessHandlerInterface
         ];
 
         if ($skipInsertions || $skipUpdates) {
-            $identifiers = $this->getEntityIdentifiers($iteration->getEntityManager(), $entity);
+            $onSkippedCallable = $this->getOption(self::OPTION_ON_SKIPPED_CALLABLE);
+            $exists = $iteration->getEntityManager()->contains($entity);
 
-            if ($identifiers) {
-                $onSkippedCallable = $this->getOption(self::OPTION_ON_SKIPPED_CALLABLE);
-
-                $exists = null !== $iteration
-                        ->getEntityManager()
-                        ->find($entity::class, $identifiers);
-
-                if (!$exists && $skipInsertions) {
-                    if (is_callable($onSkippedCallable)) {
-                        $onSkippedCallable($entity, $iteration);
-                    }
-
-                    return;
+            if (!$exists && $skipInsertions) {
+                if (\is_callable($onSkippedCallable)) {
+                    $onSkippedCallable($entity, $iteration);
                 }
 
-                if ($exists && $skipUpdates) {
-                    if (is_callable($onSkippedCallable)) {
-                        $onSkippedCallable($entity, $iteration);
-                    }
+                return;
+            }
 
-                    return;
+            if ($exists && $skipUpdates) {
+                if (\is_callable($onSkippedCallable)) {
+                    $onSkippedCallable($entity, $iteration);
                 }
+
+                return;
             }
         }
 
-        if (is_callable($prePersist = $this->getOption(self::OPTION_PRE_PERSIST_CALLABLE))) {
+        if (\is_callable($prePersist = $this->getOption(self::OPTION_PRE_PERSIST_CALLABLE))) {
             $prePersist($entity, $iteration);
         }
 
         $iteration
             ->getEntityManager()
-            ->persist($entity);
+            ->persist($entity)
+        ;
 
-        if (is_callable($postPersist = $this->getOption(self::OPTION_POST_PERSIST_CALLABLE))) {
+        if (\is_callable($postPersist = $this->getOption(self::OPTION_POST_PERSIST_CALLABLE))) {
             $postPersist($entity, $iteration);
         }
     }
@@ -115,21 +117,5 @@ final class PersistEntityHandler implements ProcessHandlerInterface
         $this->setOption(self::OPTION_POST_PERSIST_CALLABLE, $callable);
 
         return $this;
-    }
-
-    /**
-     * @internal
-     *
-     * @return mixed[]
-     */
-    private function getEntityIdentifiers(EntityManagerInterface $entityManager, object $entity): array
-    {
-        $classMetadata = $entityManager->getClassMetadata($entity::class);
-
-        if ($classMetadata->isIdentifierComposite) {
-            return [];
-        }
-
-        return $classMetadata->getIdentifierValues($entity);
     }
 }

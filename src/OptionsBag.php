@@ -1,6 +1,15 @@
 <?php
 
-namespace Ang3\Doctrine\ORM\BatchProcess;
+declare(strict_types=1);
+
+/*
+ * This file is part of package ang3/php-doctrine-orm-batch
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace Ang3\Doctrine\ORM\Batch;
 
 class OptionsBag implements \ArrayAccess, \Countable
 {
@@ -19,7 +28,7 @@ class OptionsBag implements \ArrayAccess, \Countable
      */
     public function offsetExists($offset): bool
     {
-        return array_key_exists($offset, $this->options);
+        return \array_key_exists($offset, $this->options);
     }
 
     /**
@@ -46,7 +55,7 @@ class OptionsBag implements \ArrayAccess, \Countable
      */
     public function offsetUnset($offset): void
     {
-        if (array_key_exists($offset, $this->options)) {
+        if (\array_key_exists($offset, $this->options)) {
             unset($this->options[$offset]);
         }
     }
@@ -85,7 +94,7 @@ class OptionsBag implements \ArrayAccess, \Countable
 
     public function count(): int
     {
-        return count($this->options);
+        return \count($this->options);
     }
 
     /**

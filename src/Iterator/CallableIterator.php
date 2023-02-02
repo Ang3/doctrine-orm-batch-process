@@ -1,10 +1,17 @@
 <?php
 
-namespace Ang3\Doctrine\ORM\BatchProcess\Iterator;
+declare(strict_types=1);
 
-use Generator;
+/*
+ * This file is part of package ang3/php-doctrine-orm-batch
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
-class CallableProcessIterator implements ProcessIteratorInterface
+namespace Ang3\Doctrine\ORM\Batch\Iterator;
+
+class CallableIterator implements BatchIteratorInterface
 {
     use ProcessIteratorTrait;
 
@@ -24,9 +31,9 @@ class CallableProcessIterator implements ProcessIteratorInterface
     }
 
     /**
-     * @return Generator|mixed[]
+     * @return \Generator|mixed[]
      */
-    public function getIterator(): Generator
+    public function getIterator(): \Generator
     {
         $callable = $this->callable;
 

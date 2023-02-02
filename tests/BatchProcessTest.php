@@ -1,13 +1,27 @@
 <?php
 
-namespace Ang3\Doctrine\ORM\BatchProcess\Tests;
+declare(strict_types=1);
+
+/*
+ * This file is part of package ang3/php-doctrine-orm-batch
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace Ang3\Doctrine\ORM\Batch\Tests;
 
 use PHPUnit\Framework\TestCase;
 
-class BatchProcessTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class BatchProcessTest extends TestCase
 {
     public function testDefault(): void
     {
-        $this->assertTrue(true);
+        static::assertTrue(true);
     }
 }

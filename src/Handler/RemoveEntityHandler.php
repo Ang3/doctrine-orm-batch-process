@@ -1,13 +1,21 @@
 <?php
 
-namespace Ang3\Doctrine\ORM\BatchProcess\Handler;
+declare(strict_types=1);
 
-use Ang3\Doctrine\ORM\BatchProcess\ProcessIteration;
-use InvalidArgumentException;
+/*
+ * This file is part of package ang3/php-doctrine-orm-batch
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
 
-final class RemoveEntityHandler implements ProcessHandlerInterface
+namespace Ang3\Doctrine\ORM\Batch\Handler;
+
+use Ang3\Doctrine\ORM\Batch\BatchIteration;
+
+final class RemoveEntityHandler implements BatchHandlerInterface
 {
-    use ProcessHandlerTrait;
+    use BatchHandlerTrait;
 
     /**
      * Handler options.
@@ -17,23 +25,24 @@ final class RemoveEntityHandler implements ProcessHandlerInterface
     private const OPTION_PRE_REMOVE_CALLABLE = 'pre_remove_callable';
     private const OPTION_POST_REMOVE_CALLABLE = 'post_remove_callable';
 
-    public function __invoke(ProcessIteration $iteration): void
+    public function __invoke(BatchIteration $iteration): void
     {
         $entity = $iteration->getData();
 
-        if (!is_object($entity)) {
-            throw new InvalidArgumentException(sprintf('Expected data of type "object", got "%s".', gettype($entity)));
+        if (!\is_object($entity)) {
+            throw new \InvalidArgumentException(sprintf('Expected data of type "object", got "%s".', \gettype($entity)));
         }
 
-        if (is_callable($preRemove = $this->getOption(self::OPTION_PRE_REMOVE_CALLABLE))) {
+        if (\is_callable($preRemove = $this->getOption(self::OPTION_PRE_REMOVE_CALLABLE))) {
             $preRemove($entity, $iteration);
         }
 
         $iteration
             ->getEntityManager()
-            ->persist($entity);
+            ->remove($entity)
+        ;
 
-        if (is_callable($postRemove = $this->getOption(self::OPTION_POST_REMOVE_CALLABLE))) {
+        if (\is_callable($postRemove = $this->getOption(self::OPTION_POST_REMOVE_CALLABLE))) {
             $postRemove($entity, $iteration);
         }
     }

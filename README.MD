@@ -1,10 +1,12 @@
-Doctrine ORM Batch Process
-==========================
+Doctrine ORM Batch Component
+============================
 
-[![Build Status](https://api.travis-ci.com/Ang3/doctrine-orm-batch-process.svg?branch=main)](https://app.travis-ci.com/github/Ang3/doctrine-orm-batch-process)
-[![Latest Stable Version](https://poser.pugx.org/ang3/doctrine-orm-batch-process/v/stable)](https://packagist.org/packages/ang3/doctrine-orm-batch-process)
-[![Latest Unstable Version](https://poser.pugx.org/ang3/doctrine-orm-batch-process/v/unstable)](https://packagist.org/packages/ang3/doctrine-orm-batch-process)
-[![Total Downloads](https://poser.pugx.org/ang3/doctrine-orm-batch-process/downloads)](https://packagist.org/packages/ang3/doctrine-orm-batch-process)
+[![Code Quality](https://github.com/Ang3/doctrine-orm-batch/actions/workflows/php_lint.yml/badge.svg)](https://github.com/Ang3/doctrine-orm-batch/actions/workflows/php_lint.yml)
+[![PHPUnit Tests](https://github.com/Ang3/doctrine-orm-batch/actions/workflows/phpunit.yml/badge.svg)](https://github.com/Ang3/doctrine-orm-batch/actions/workflows/phpunit.yml)
+[![Symfony Integration](https://github.com/Ang3/doctrine-orm-batch/actions/workflows/symfony.yml/badge.svg)](https://github.com/Ang3/doctrine-orm-batch/actions/workflows/symfony.yml)
+[![Latest Stable Version](https://poser.pugx.org/ang3/doctrine-orm-batch/v/stable)](https://packagist.org/packages/ang3/doctrine-orm-batch)
+[![Latest Unstable Version](https://poser.pugx.org/ang3/doctrine-orm-batch/v/unstable)](https://packagist.org/packages/ang3/doctrine-orm-batch)
+[![Total Downloads](https://poser.pugx.org/ang3/doctrine-orm-batch/downloads)](https://packagist.org/packages/ang3/doctrine-orm-batch)
 
 This component helps you to deal with 
 [batch-processing](https://www.doctrine-project.org/projects/doctrine-orm/en/latest/reference/batch-processing.html) 
@@ -23,7 +25,7 @@ Open a command console, enter your project directory and execute the
 following command to download the latest stable version of this bundle:
 
 ```console
-$ composer require ang3/doctrine-orm-batch-process
+$ composer require ang3/doctrine-orm-batch
 ```
 
 This command requires you to have Composer installed globally, as explained
@@ -44,7 +46,7 @@ To create a process, use the constructor with the entity manager and an iterator
 or use one of defined static shortcut methods as to your needs:
 
 ```php
-use Ang3\Component\Doctrine\ORM\BatchProcess\BatchProcess;
+use Ang3\Component\Doctrine\ORM\Batch\BatchProcess;
 
 $myProcess = new BatchProcess($entityManager, $myIterator, $myHandler = null, $bufferSize = 20);
 
@@ -56,19 +58,13 @@ $myProcess = BatchProcess::create($entityManager, $myIterator);
  */
 
 // Iterate from identified entities
-$myProcess = BatchProcess::iterateIdentifiedEntities($entityManager, $entityFqcn, array $identifiers);
+$myProcess = BatchProcess::iterateEntities($entityManager, $entityFqcn, array $identifiers);
 
-// Iterate from an ORM query builder instance
-$myProcess = BatchProcess::iterateQueryBuilderResult($queryBuilder);
+// Iterate from an ORM query or query builder instance
+$myProcess = BatchProcess::iterateQueryResult($query);
 
-// Iterate from an ORM query
-$myProcess = BatchProcess::iterateOrmQuery($query);
-
-// Iterate from a callable
-$myProcess = BatchProcess::iterateCallable(EntityManagerInterface $entityManager, callable $callback);
-
-// Iterate from iterable data
-$myProcess = BatchProcess::iterate($entityManager, $data);
+// Iterate from iterable or callable
+$myProcess = BatchProcess::iterateData($entityManager, iterable|\Closure $data);
 ```
 
 To execute the process:
@@ -79,16 +75,16 @@ $nbIterations = $myProcess->execute();
 
 ## Advanced options
 
-The batch process provides some useful advanced options.
+This component provides some useful advanced options.
 
 ### Handlers
 
 A handler is a class implementing the interface
-```Ang3\Component\Doctrine\ORM\BatchProcess\Handler\ProcessHandlerInterface```. This class is called on each iteration. 
+```Ang3\Component\Doctrine\ORM\Batch\Handler\BatchHandlerInterface```. This class is called on each iteration. 
 It allows you to persist/remove entities, or whatever you need with custom handlers.
 
 This interface describes the method called by the batch process: 
-```__invoke(\Ang3\Component\Doctrine\ORM\BatchProcess\ProcessIteration $iteration)```.
+```__invoke(\Ang3\Component\Doctrine\ORM\Batch\BatchIteration $iteration)```.
 
 The component provides some useful built-in handlers.
 
@@ -97,7 +93,7 @@ The component provides some useful built-in handlers.
 This handler persists entities into database.
 
 ```php
-use Ang3\Component\Doctrine\ORM\BatchProcess\Handler\PersistEntityHandler;
+use Ang3\Component\Doctrine\ORM\Batch\Handler\PersistEntityHandler;
 
 $myHandler = PersistEntityHandler::new()
     // Handler options...
@@ -111,14 +107,14 @@ $myHandler = PersistEntityHandler::new()
 Callable arguments:
 
 1. ```object``` The entity
-2. ```Ang3\Component\Doctrine\ORM\BatchProcess\ProcessIteration``` The iteration.
+2. ```Ang3\Component\Doctrine\ORM\Batch\BatchIteration``` The iteration.
 
 #### Remove entity handler
 
 This handler removes entities into database.
 
 ```php
-use Ang3\Component\Doctrine\ORM\BatchProcess\Handler\RemoveEntityHandler;
+use Ang3\Component\Doctrine\ORM\Batch\Handler\RemoveEntityHandler;
 
 $myHandler = RemoveEntityHandler::new()
     // Handler options...
@@ -130,14 +126,14 @@ $myHandler = RemoveEntityHandler::new()
 Callable arguments:
 
 1. ```object``` The entity
-2. ```Ang3\Component\Doctrine\ORM\BatchProcess\ProcessIteration``` The iteration.
+2. ```Ang3\Component\Doctrine\ORM\Batch\BatchIteration``` The iteration.
 
 #### Callable handler
 
 This handler holds a simple callable.
 
 ```php
-use Ang3\Component\Doctrine\ORM\BatchProcess\Handler\CallableHandler;
+use Ang3\Component\Doctrine\ORM\Batch\Handler\CallableHandler;
 
 $myHandler = CallableHandler::new($myCallable);
 ```
@@ -145,14 +141,14 @@ $myHandler = CallableHandler::new($myCallable);
 Callable arguments:
 
 1. ```mixed``` Iterator data
-2. ```Ang3\Component\Doctrine\ORM\BatchProcess\ProcessIteration``` The iteration.
+2. ```Ang3\Component\Doctrine\ORM\Batch\BatchIteration``` The iteration.
 
 #### Chain handler
 
 This handler allows you to chain handlers in a specific order.
 
 ```php
-use Ang3\Component\Doctrine\ORM\BatchProcess\Handler\ChainHandler;
+use Ang3\Component\Doctrine\ORM\Batch\Handler\ChainHandler;
 
 $myHandler = ChainHandler::new()
     // Handler options...
@@ -164,18 +160,16 @@ $myHandler = ChainHandler::new()
 
 #### Custom handler
 
-Create a class implementing the interface ```Ang3\Component\Doctrine\ORM\BatchProcess\Handler\ProcessHandlerInterface```.
-
-Use the trait ```Ang3\Component\Doctrine\ORM\BatchProcess\Handler\ProcessHandlerTrait``` to enable options.
+Create a class implementing the interface ```Ang3\Component\Doctrine\ORM\Batch\Handler\BatchHandlerInterface```.
 
 ```php
-namespace App\Doctrine\BatchProcess\Handler;
+namespace App\Doctrine\Batch\Handler;
 
-use Ang3\Component\Doctrine\ORM\BatchProcess\Handler\ProcessHandlerInterface;
+use Ang3\Component\Doctrine\ORM\Batch\Handler\BatchHandlerInterface;
 
-final class MyHandler implements ProcessHandlerInterface
+final class MyHandler implements BatchHandlerInterface
 {
-    public function __invoke(ProcessIteration $iteration): void
+    public function __invoke(Iteration $iteration): void
     {
         // Data from the process iterator
         $data = $iteration->getData();
@@ -186,19 +180,19 @@ final class MyHandler implements ProcessHandlerInterface
 }
 ```
 
-Use the trait ```Ang3\Component\Doctrine\ORM\BatchProcess\Handler\ProcessHandlerTrait``` to enable options:
+Use the trait ```Ang3\Component\Doctrine\ORM\Batch\Handler\BatchHandlerTrait``` to enable options:
 
 ```php
 // ...
-final class MyHandler implements ProcessHandlerInterface
+final class MyHandler implements BatchHandlerInterface
 {
     // If you want to add options:
-    use ProcessHandlerTrait;
+    use BatchHandlerTrait;
     
     // Internal constants used to define options
     private const OPTION_ENABLED = 'enabled';
     
-    public function __invoke(ProcessIteration $iteration): void
+    public function __invoke(Iteration $iteration): void
     {
         // Retrieves option values
         $enabled = $this->getOption(self::OPTION_ENABLED);
@@ -266,7 +260,7 @@ dump($myLoadedEntity); // reloaded by the process on each flush/clear
 
 #### On flush
 
-You can pass a callable to the process to execute some logic on each flush/clear operations.
+You can pass a callable to the batch to execute some logic on each flush/clear operations.
 
 ```php
 $myProcess->onFlush($myCallable);
@@ -274,5 +268,5 @@ $myProcess->onFlush($myCallable);
 
 Callable arguments:
 
-1. ```Ang3\Component\Doctrine\ORM\BatchProcess\BatchProcess``` The current process
-2. ```Ang3\Component\Doctrine\ORM\BatchProcess\ProcessIteration|null``` The iteration (NULL in case of last flush/clear).
+1. ```Ang3\Component\Doctrine\ORM\Batch\BatchProcess``` The current batch
+2. ```Ang3\Component\Doctrine\ORM\Batch\BatchIteration|null``` The iteration (NULL in case of last flush/clear).
