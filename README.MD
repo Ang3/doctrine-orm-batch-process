@@ -3,7 +3,6 @@ Doctrine ORM Batch Component
 
 [![Code Quality](https://github.com/Ang3/doctrine-orm-batch-process/actions/workflows/php_lint.yml/badge.svg)](https://github.com/Ang3/doctrine-orm-batch-process/actions/workflows/php_lint.yml)
 [![PHPUnit Tests](https://github.com/Ang3/doctrine-orm-batch-process/actions/workflows/phpunit.yml/badge.svg)](https://github.com/Ang3/doctrine-orm-batch-process/actions/workflows/phpunit.yml)
-[![Symfony Integration](https://github.com/Ang3/doctrine-orm-batch-process/actions/workflows/symfony.yml/badge.svg)](https://github.com/Ang3/doctrine-orm-batch-process/actions/workflows/symfony.yml)
 [![Latest Stable Version](https://poser.pugx.org/ang3/doctrine-orm-batch-process/v/stable)](https://packagist.org/packages/ang3/doctrine-orm-batch-process)
 [![Latest Unstable Version](https://poser.pugx.org/ang3/doctrine-orm-batch-process/v/unstable)](https://packagist.org/packages/ang3/doctrine-orm-batch-process)
 [![Total Downloads](https://poser.pugx.org/ang3/doctrine-orm-batch-process/downloads)](https://packagist.org/packages/ang3/doctrine-orm-batch-process)
