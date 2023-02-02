@@ -1,12 +1,12 @@
 Doctrine ORM Batch Component
 ============================
 
-[![Code Quality](https://github.com/Ang3/doctrine-orm-batch/actions/workflows/php_lint.yml/badge.svg)](https://github.com/Ang3/doctrine-orm-batch/actions/workflows/php_lint.yml)
-[![PHPUnit Tests](https://github.com/Ang3/doctrine-orm-batch/actions/workflows/phpunit.yml/badge.svg)](https://github.com/Ang3/doctrine-orm-batch/actions/workflows/phpunit.yml)
-[![Symfony Integration](https://github.com/Ang3/doctrine-orm-batch/actions/workflows/symfony.yml/badge.svg)](https://github.com/Ang3/doctrine-orm-batch/actions/workflows/symfony.yml)
-[![Latest Stable Version](https://poser.pugx.org/ang3/doctrine-orm-batch/v/stable)](https://packagist.org/packages/ang3/doctrine-orm-batch)
-[![Latest Unstable Version](https://poser.pugx.org/ang3/doctrine-orm-batch/v/unstable)](https://packagist.org/packages/ang3/doctrine-orm-batch)
-[![Total Downloads](https://poser.pugx.org/ang3/doctrine-orm-batch/downloads)](https://packagist.org/packages/ang3/doctrine-orm-batch)
+[![Code Quality](https://github.com/Ang3/doctrine-orm-batch-process/actions/workflows/php_lint.yml/badge.svg)](https://github.com/Ang3/doctrine-orm-batch-process/actions/workflows/php_lint.yml)
+[![PHPUnit Tests](https://github.com/Ang3/doctrine-orm-batch-process/actions/workflows/phpunit.yml/badge.svg)](https://github.com/Ang3/doctrine-orm-batch-process/actions/workflows/phpunit.yml)
+[![Symfony Integration](https://github.com/Ang3/doctrine-orm-batch-process/actions/workflows/symfony.yml/badge.svg)](https://github.com/Ang3/doctrine-orm-batch-process/actions/workflows/symfony.yml)
+[![Latest Stable Version](https://poser.pugx.org/ang3/doctrine-orm-batch-process/v/stable)](https://packagist.org/packages/ang3/doctrine-orm-batch-process)
+[![Latest Unstable Version](https://poser.pugx.org/ang3/doctrine-orm-batch-process/v/unstable)](https://packagist.org/packages/ang3/doctrine-orm-batch-process)
+[![Total Downloads](https://poser.pugx.org/ang3/doctrine-orm-batch-process/downloads)](https://packagist.org/packages/ang3/doctrine-orm-batch-process)
 
 This component helps you to deal with 
 [batch-processing](https://www.doctrine-project.org/projects/doctrine-orm/en/latest/reference/batch-processing.html) 
@@ -25,7 +25,7 @@ Open a command console, enter your project directory and execute the
 following command to download the latest stable version of this bundle:
 
 ```console
-$ composer require ang3/doctrine-orm-batch
+$ composer require ang3/doctrine-orm-batch-process
 ```
 
 This command requires you to have Composer installed globally, as explained
