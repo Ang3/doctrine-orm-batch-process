@@ -317,6 +317,10 @@ class BatchProcess
                 $this->flush($batchIteration);
             }
 
+            if (\is_object($data) && $this->entityManager->contains($data)) {
+                $this->entityManager->detach($data);
+            }
+
             ++$count;
         }
 
