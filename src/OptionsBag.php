@@ -43,7 +43,6 @@ class OptionsBag implements \ArrayAccess, \Countable
 
     /**
      * @param string $offset
-     * @param mixed  $value
      */
     public function offsetSet($offset, $value): void
     {
@@ -74,9 +73,6 @@ class OptionsBag implements \ArrayAccess, \Countable
         return $this;
     }
 
-    /**
-     * @param mixed $value
-     */
     public function set(string $name, $value): self
     {
         $this->options[$name] = $value;

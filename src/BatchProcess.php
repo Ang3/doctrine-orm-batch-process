@@ -69,7 +69,7 @@ class BatchProcess
         private readonly EntityManagerInterface $entityManager,
         private BatchIteratorInterface $iterator,
         private ?BatchHandlerInterface $handler = null,
-        ?int $bufferSize = null
+        int $bufferSize = null
     ) {
         $this->options = new OptionsBag(self::DEFAULT_OPTIONS);
         $this->setBufferSize($bufferSize ?: self::DEFAULT_BUFFER_SIZE);
@@ -107,7 +107,7 @@ class BatchProcess
         return $this;
     }
 
-    public function setHandler(?BatchHandlerInterface $handler = null): self
+    public function setHandler(BatchHandlerInterface $handler = null): self
     {
         $this->handler = $handler;
 
@@ -263,7 +263,7 @@ class BatchProcess
             $metadata->setIdGenerator(new AssignedGenerator());
         }
 
-		$iterator = $this->iterate();
+        $iterator = $this->iterate();
 
         try {
             foreach ($iterator as $batchIteration) {
@@ -297,10 +297,8 @@ class BatchProcess
 
         $this->runTime = microtime(true) - $microTime;
 
-		/** @var int $count */
-		$count = $iterator->getReturn();
-
-        return $count;
+        /** @var int $count */
+        return $iterator->getReturn();
     }
 
     /**
@@ -335,7 +333,7 @@ class BatchProcess
     /**
      * @internal
      */
-    private function flush(?BatchIteration $iteration = null): void
+    private function flush(BatchIteration $iteration = null): void
     {
         $this->entityManager->flush();
         $this->entityManager->clear();
