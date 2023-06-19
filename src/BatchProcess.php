@@ -263,8 +263,10 @@ class BatchProcess
             $metadata->setIdGenerator(new AssignedGenerator());
         }
 
+		$iterator = $this->iterate();
+
         try {
-            foreach ($this->iterate() as $batchIteration) {
+            foreach ($iterator as $batchIteration) {
                 if (0 === $count && \is_callable($firstIterationCallable = $this->getOption(self::OPTION_ON_FIRST_ITERATION_CALLABLE))) {
                     $firstIterationCallable($batchIteration);
                 }
@@ -295,6 +297,9 @@ class BatchProcess
 
         $this->runTime = microtime(true) - $microTime;
 
+		/** @var int $count */
+		$count = $iterator->getReturn();
+
         return $count;
     }
 
@@ -315,10 +320,6 @@ class BatchProcess
 
             if ($count > 1 && 0 === ($count % $this->getBufferSize())) {
                 $this->flush($batchIteration);
-            }
-
-            if (\is_object($data) && $this->entityManager->contains($data)) {
-                $this->entityManager->detach($data);
             }
 
             ++$count;
