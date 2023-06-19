@@ -45,7 +45,7 @@ To create a process, use the constructor with the entity manager and an iterator
 or use one of defined static shortcut methods as to your needs:
 
 ```php
-use Ang3\Component\Doctrine\ORM\Batch\BatchProcess;
+use Ang3\Doctrine\ORM\Batch\BatchProcess;
 
 $myProcess = new BatchProcess($entityManager, $myIterator, $myHandler = null, $bufferSize = 20);
 
@@ -79,11 +79,11 @@ This component provides some useful advanced options.
 ### Handlers
 
 A handler is a class implementing the interface
-```Ang3\Component\Doctrine\ORM\Batch\Handler\BatchHandlerInterface```. This class is called on each iteration. 
+```Ang3\Doctrine\ORM\Batch\Handler\BatchHandlerInterface```. This class is called on each iteration. 
 It allows you to persist/remove entities, or whatever you need with custom handlers.
 
 This interface describes the method called by the batch process: 
-```__invoke(\Ang3\Component\Doctrine\ORM\Batch\BatchIteration $iteration)```.
+```__invoke(\Ang3\Doctrine\ORM\Batch\BatchIteration $iteration)```.
 
 The component provides some useful built-in handlers.
 
@@ -92,7 +92,7 @@ The component provides some useful built-in handlers.
 This handler persists entities into database.
 
 ```php
-use Ang3\Component\Doctrine\ORM\Batch\Handler\PersistEntityHandler;
+use Ang3\Doctrine\ORM\Batch\Handler\PersistEntityHandler;
 
 $myHandler = PersistEntityHandler::new()
     // Handler options...
@@ -106,14 +106,14 @@ $myHandler = PersistEntityHandler::new()
 Callable arguments:
 
 1. ```object``` The entity
-2. ```Ang3\Component\Doctrine\ORM\Batch\BatchIteration``` The iteration.
+2. ```Ang3\Doctrine\ORM\Batch\BatchIteration``` The iteration.
 
 #### Remove entity handler
 
 This handler removes entities into database.
 
 ```php
-use Ang3\Component\Doctrine\ORM\Batch\Handler\RemoveEntityHandler;
+use Ang3\Doctrine\ORM\Batch\Handler\RemoveEntityHandler;
 
 $myHandler = RemoveEntityHandler::new()
     // Handler options...
@@ -125,14 +125,14 @@ $myHandler = RemoveEntityHandler::new()
 Callable arguments:
 
 1. ```object``` The entity
-2. ```Ang3\Component\Doctrine\ORM\Batch\BatchIteration``` The iteration.
+2. ```Ang3\Doctrine\ORM\Batch\BatchIteration``` The iteration.
 
 #### Callable handler
 
 This handler holds a simple callable.
 
 ```php
-use Ang3\Component\Doctrine\ORM\Batch\Handler\CallableHandler;
+use Ang3\Doctrine\ORM\Batch\Handler\CallableHandler;
 
 $myHandler = CallableHandler::new($myCallable);
 ```
@@ -140,14 +140,14 @@ $myHandler = CallableHandler::new($myCallable);
 Callable arguments:
 
 1. ```mixed``` Iterator data
-2. ```Ang3\Component\Doctrine\ORM\Batch\BatchIteration``` The iteration.
+2. ```Ang3\Doctrine\ORM\Batch\BatchIteration``` The iteration.
 
 #### Chain handler
 
 This handler allows you to chain handlers in a specific order.
 
 ```php
-use Ang3\Component\Doctrine\ORM\Batch\Handler\ChainHandler;
+use Ang3\Doctrine\ORM\Batch\Handler\ChainHandler;
 
 $myHandler = ChainHandler::new()
     // Handler options...
@@ -159,12 +159,12 @@ $myHandler = ChainHandler::new()
 
 #### Custom handler
 
-Create a class implementing the interface ```Ang3\Component\Doctrine\ORM\Batch\Handler\BatchHandlerInterface```.
+Create a class implementing the interface ```Ang3\Doctrine\ORM\Batch\Handler\BatchHandlerInterface```.
 
 ```php
 namespace App\Doctrine\Batch\Handler;
 
-use Ang3\Component\Doctrine\ORM\Batch\Handler\BatchHandlerInterface;
+use Ang3\Doctrine\ORM\Batch\Handler\BatchHandlerInterface;
 
 final class MyHandler implements BatchHandlerInterface
 {
@@ -179,7 +179,7 @@ final class MyHandler implements BatchHandlerInterface
 }
 ```
 
-Use the trait ```Ang3\Component\Doctrine\ORM\Batch\Handler\BatchHandlerTrait``` to enable options:
+Use the trait ```Ang3\Doctrine\ORM\Batch\Handler\BatchHandlerTrait``` to enable options:
 
 ```php
 // ...
@@ -267,5 +267,5 @@ $myProcess->onFlush($myCallable);
 
 Callable arguments:
 
-1. ```Ang3\Component\Doctrine\ORM\Batch\BatchProcess``` The current batch
-2. ```Ang3\Component\Doctrine\ORM\Batch\BatchIteration|null``` The iteration (NULL in case of last flush/clear).
+1. ```Ang3\Doctrine\ORM\Batch\BatchProcess``` The current batch
+2. ```Ang3\Doctrine\ORM\Batch\BatchIteration|null``` The iteration (NULL in case of last flush/clear).
