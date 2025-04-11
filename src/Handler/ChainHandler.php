@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * This file is part of package ang3/php-doctrine-orm-batch
+ * This file is part of package ang3/doctrine-orm-batch-process
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -13,6 +13,12 @@ namespace Ang3\Doctrine\ORM\Batch\Handler;
 
 use Ang3\Doctrine\ORM\Batch\BatchIteration;
 
+/**
+ * @template TKey of array-key
+ * @template TValue of BatchHandlerInterface
+ *
+ * @implements \IteratorAggregate<TKey, TValue>
+ */
 final class ChainHandler implements BatchHandlerInterface, \IteratorAggregate, \Countable
 {
     use BatchHandlerTrait;
@@ -25,7 +31,7 @@ final class ChainHandler implements BatchHandlerInterface, \IteratorAggregate, \
     /**
      * @param BatchHandlerInterface[] $handlers
      */
-    public function __construct(array $handlers = [])
+    public function __construct(iterable $handlers = [])
     {
         foreach ($handlers as $handler) {
             $this->append($handler);
@@ -41,15 +47,14 @@ final class ChainHandler implements BatchHandlerInterface, \IteratorAggregate, \
 
     /**
      * @param BatchHandlerInterface[] $handlers
+     *
+     * @return self<int|string, BatchHandlerInterface>
      */
-    public static function new(array $handlers = []): self
+    public static function new(iterable $handlers = []): self
     {
         return new self($handlers);
     }
 
-    /**
-     * @return \Generator|BatchHandlerInterface[]
-     */
     public function getIterator(): \Generator
     {
         foreach ($this->handlers as $handler) {
@@ -57,6 +62,9 @@ final class ChainHandler implements BatchHandlerInterface, \IteratorAggregate, \
         }
     }
 
+    /**
+     * @return self<int|string, BatchHandlerInterface>
+     */
     public function prepend(BatchHandlerInterface $handler): self
     {
         if (!\in_array($handler, $this->handlers, true)) {
@@ -66,6 +74,9 @@ final class ChainHandler implements BatchHandlerInterface, \IteratorAggregate, \
         return $this;
     }
 
+    /**
+     * @return self<int|string, BatchHandlerInterface>
+     */
     public function append(BatchHandlerInterface $handler): self
     {
         if (!\in_array($handler, $this->handlers, true)) {
@@ -75,6 +86,9 @@ final class ChainHandler implements BatchHandlerInterface, \IteratorAggregate, \
         return $this;
     }
 
+    /**
+     * @return self<int|string, BatchHandlerInterface>
+     */
     public function remove(BatchHandlerInterface $handler): self
     {
         $key = array_search($handler, $this->handlers, true);
@@ -101,6 +115,9 @@ final class ChainHandler implements BatchHandlerInterface, \IteratorAggregate, \
         return $handlers[0] ?? null;
     }
 
+    /**
+     * @return self<int|string, BatchHandlerInterface>
+     */
     public function clear(): self
     {
         $this->handlers = [];

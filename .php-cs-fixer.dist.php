@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 $header = <<<'EOF'
-    This file is part of package ang3/php-doctrine-orm-batch
+    This file is part of package ang3/doctrine-orm-batch-process
     
     This source file is subject to the MIT license that is bundled
     with this source code in the file LICENSE.
@@ -24,6 +24,8 @@ $config = new PhpCsFixer\Config();
 $config
     ->setRiskyAllowed(true)
     ->setRules([
+        '@PHP81Migration' => true,
+        '@PHP80Migration:risky' => true,
         '@PHP74Migration' => true,
         '@PHP74Migration:risky' => true,
         '@PHPUnit100Migration:risky' => true,
@@ -39,22 +41,5 @@ $config
     ])
     ->setFinder($finder)
 ;
-
-// special handling of fabbot.io service if it's using too old PHP CS Fixer version
-if (false !== getenv('FABBOT_IO')) {
-    try {
-        PhpCsFixer\FixerFactory::create()
-            ->registerBuiltInFixers()
-            ->registerCustomFixers($config->getCustomFixers())
-            ->useRuleSet(new PhpCsFixer\RuleSet($config->getRules()))
-        ;
-    } catch (PhpCsFixer\ConfigurationException\InvalidConfigurationException $e) {
-        $config->setRules([]);
-    } catch (UnexpectedValueException $e) {
-        $config->setRules([]);
-    } catch (InvalidArgumentException $e) {
-        $config->setRules([]);
-    }
-}
 
 return $config;
